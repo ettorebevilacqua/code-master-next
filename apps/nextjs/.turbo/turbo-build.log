@@ -1,0 +1,43 @@
+
+> @acme/nextjs@0.1.0 build /home/etto/prj/active/code-master/apps/nextjs
+> pnpm with-env next build
+
+
+> @acme/nextjs@0.1.0 with-env /home/etto/prj/active/code-master/apps/nextjs
+> dotenv -e ../../.env -- "next" "build"
+
+   ▲ Next.js 14.0.1
+
+   Creating an optimized production build ...
+(node:77411) [DEP_WEBPACK_MODULE_UPDATE_HASH] DeprecationWarning: Module.updateHash: Use new ChunkGraph API
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ✓ Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/6) ...
+   Generating static pages (1/6) 
+   Generating static pages (2/6) 
+   Generating static pages (4/6) 
+ ✓ Generating static pages (6/6) 
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ λ /                                    2.24 kB         267 kB
+├ λ /_not-found                          885 B          86.2 kB
+├ λ /api/auth/[...nextauth]              0 B                0 B
+├ λ /api/trpc/[trpc]                     0 B                0 B
+├ λ /login                               2.63 kB         101 kB
+└ λ /signup                              7.19 kB         121 kB
++ First Load JS shared by all            85.4 kB
+  ├ chunks/1dd3208c-cffbef97bcdaa005.js  53.2 kB
+  ├ chunks/53-074419775470361c.js        30.1 kB
+  ├ chunks/main-app-20b82eb921b860eb.js  237 B
+  └ chunks/webpack-81382bb2d02b4420.js   1.84 kB
+
+
+ƒ Middleware                             110 kB
+
+λ  (Dynamic)  server-rendered on demand using Node.js
+
