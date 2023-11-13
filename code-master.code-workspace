@@ -3,9 +3,6 @@
 		{
 			"path": "."
 		},
-		{
-			"path": "../../template/code-master1/.vscode"
-		}
 	],
 	"settings": {}
 }
