@@ -47,3 +47,5 @@ yarn-error.log*
 
 # db
 db.sqlite
+# React Component Preview
+previewConfig.json

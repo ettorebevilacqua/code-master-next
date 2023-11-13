@@ -1,5 +1,14 @@
 # Create T3 App
 
+## etto
+
+### to see
+
+<https://github.com/vercel/style-guide>
+
+***see blog***
+<https://github.com/acorn1010/vote/blob/main/src/server/router/models/topic.ts>
+
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
 ## What's next? How do I make an app with this?
