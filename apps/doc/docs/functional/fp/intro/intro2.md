@@ -496,6 +496,10 @@ la if è un costrutto pesante per seguire il flusso, per questo viene usata la m
 
 [articolo di riferimento ](https://www.codingame.com/playgrounds/6272/building-a-maybe-in-javascript)
 
-[i functor ](https://javascript.plainenglish.io/the-definite-guide-to-functors-in-js-6f5e82bd1dac)
+[la guida più amata per l' introduzione alla programmazione funzionale](https://mostly-adequate.gitbook.io/mostly-adequate-guide/)
 
-[i functor](https://stackoverflow.com/questions/63390339/functor-implementation-in-javascript)
+### La teoria sui container chiamati functor
+
+[i functor 1](https://javascript.plainenglish.io/the-definite-guide-to-functors-in-js-6f5e82bd1dac)
+
+[i functor 2](https://stackoverflow.com/questions/63390339/functor-implementation-in-javascript)
