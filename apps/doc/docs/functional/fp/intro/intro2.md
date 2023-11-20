@@ -3,9 +3,11 @@
 ## Partiamo dal difficile
 
 Il concetto di monadi generalmente rimane molto ostico da comprendere, in questo articolo vogliamo rendere questa spiegazione quanto più semplice.
-In genere questo argomento viene spiegato dopo aver spiegato diversi concetti di base della programmazione funzionale, per esempio le funzioni pure, il curry ecc
-Qui partiamo subito con il concetto più avanzato.
-A mio avviso trattato subito come argomento, è possibile argomentarlo senza particolare propedeuticità iniziale.
+In genere questo argomento viene spiegato dopo aver spiegato diversi concetti di base della programmazione funzionale, per esempio le funzioni pure, il curry e la teoria dietro.
+
+Qui si cerca di andare al sodo, si evita la teoria che una volta utilizzato un po di codice, risulta meno ostica da comprendere, ma in molti casi per poterli utilizzare come facciamo con le promise, non cè bisogno di molta teoria, utile se si vuole approfondire bene la programmazione funzionale e avere competenze più solide.
+
+Uno dei grossi problemi alla programmazione funzionale è l' abitudine alla programmazione imperativa, chi cosi abituato spesso deve fare uno sforzo in più a causa del abitudine, per esempio se dicessi di usare solo variabili costanti che andiamo qui a vedere, il primo pensiero è che non è possibile questo approccio perché senza variabili che variano i valori non si può programmare.
 
 ## I contenitori
 
@@ -310,7 +312,7 @@ Questo è l aspetto che ci interessa, la concatenazione di map eseguono un fluss
 
 ### a cosa serve quindi la maybe ??
 
-La maybe permette una biforcazione del flusso, come fa la if, ma senza che devo scrivere codice che controlla valori null perchè lo fa al suo interno con il suo map restituendoci maybe di tipo nothing o just !!
+La maybe permette una biforcazione del flusso, come fa la if, ma senza che devo scrivere codice che controlla valori null perché lo fa al suo interno con il suo map restituendoci maybe di tipo nothing o just !!
 
 ***Importante è quindi vedere la maybe come due tipi che possono essere just o nothing***
 
@@ -359,7 +361,7 @@ const val = getPropC(getPropB(a)) //   "fp"
 
 ```
 
-Ho creto delle funzioni con un solo parametro che restituiscono funzioni per il resto dei singoli parametri,
+Ho creato delle funzioni con un solo parametro che restituiscono funzioni per il resto dei singoli parametri, diciamo ***funzioni che restituiscono funzioni***
 
 ***const val = getPropC(getPropB(a))***
 
@@ -368,7 +370,7 @@ getPropC riceve \{ c: "fp"} restituito da getPropB(a) , quindi legge il valore i
 usando queste funzioni il codice precedente diventa :
 
 ```js
-const a = { b: { c: "fp"} };
+xx
 
 const prop = (propName) => (obj) => obj[propName];
 const append = (appendee) => (appendix) => appendee + appendix;
@@ -378,10 +380,122 @@ const maybeA = Maybe.just(a)
     .map(prop("c"))
     .map(append(" is great!"));
 
-console.log(maybeB.extract()); // null
+console.log(maybeB.extract()); // fp is great!
 ```
 
-ora dentro  al primo map gli passo una funzione già definita pronta a leggere il membro b di un oggetto passato in quanto restituisce a sua volta una funzione che dato un oggetto legge il membro il b,  funzione come prima : a => a.b, che prende il parametro a, 
+ora dentro  al primo map gli passo.map(prop("b")) pronta a leggere il membro b di un oggetto passato : prop("b") al interno quindi diventa:
 
-https://www.codingame.com/playgrounds/6272/building-a-maybe-in-javascript
-https://www.programiz.com/javascript/online-compiler/
+obj => obj["b"] che è la stessa cosa del nostro precedete a => a.b
+
+append ugualmente è pronto a riceve una stringa, per poi concatenarla nella sua funzione restituita.
+
+in prima battuta diciamo che aumenta la leggibilità in quanto non specifico più nella funzione dentro al map il parametro (non importa il suo nome) del oggetto da leggere, tutte le funzione passate al map hanno tale parametro ora omesso perché gestito dalla funzione di ritorno.
+
+abbiamo fatto un refactory con lo stile point-free, cioè non specifichiamo come detto il parametro iniziale, la leggibilità aumenta , più codice inseriamo più dobbiamo leggere cosa fa per capire, con un nome appropriato indico meglio con un sola parola.
+
+ma a cosa ci torna utile queste osservazioni di funzioni cosi definite rispetto alla nostra maybe ?? che potrei evitare la catena .map, passando più chiaramente il flusso da gestire :
+
+```js
+const isNullOrUndef = (value) => value === null || typeof value === "undefined";
+
+const maybe = (value) => ({
+    isNothing: () => isNullOrUndef(value),
+    extract: () => value,
+    map: (transformer) => !isNullOrUndef(value) ? Maybe.just(transformer(value)) : Maybe.nothing()
+});
+
+const Maybe = {
+    just: maybe,
+    nothing: () => maybe(null),
+    chain: (...fns) => (input) => fns.reduce((output, curr) => output.map(curr), input) // AGGIUNGIAMO CHAIN
+};
+```
+
+La funzione chain nella nostra Maybe
+
+- prende una lista di funzioni con il parametro (...fns)
+- restituisce una funzione  con il paramentro (input)
+- ciclo le funzioni passate con reduce eseguendo la catena di maybe con output passando la funzione corrente passata
+
+una volta passate le funzioni alla chain, ho una funzione con il parametro input che prende una maybe, la reduce inizializzata a questa maybe, essegue il map della maybe output passando la funzione corrente curr.
+
+il codice dovrebbe chiarire le idee rispetto a questa descrizione;
+
+```js
+const prop = (propName) => (obj) => obj[propName];
+const append = (appendee) => (appendix) => appendix + appendee;
+
+const a = { b: { c: "fp"} };
+
+const appendToC = Maybe.chain(
+    prop("b"),
+    prop("c"),
+    append(" is great!")
+);
+
+const goodInput = Maybe.just(a);
+const badInput = Maybe.just({});
+
+console.log(appendToC(goodInput).extract())
+console.log(appendToC(badInput).extract());
+
+```
+
+con chain abbiamo eliminato concatenazione dei map, passando più chiaramente una lista di funzioni, senza l uso di prop e append mi sarei trovato
+
+```js
+const appendToC = Maybe.chain(
+    o => o.b
+    o => o.c,
+    c => c + " is great!"
+);
+
+// nella versione iniziale scrivavamo :
+
+const maybeA = Maybe.just(a)
+.map(a => a.b)
+.map(b => b.c)
+.map(c => c + " is great!");
+
+//  versione finale
+
+const appendToC = Maybe.chain(
+    prop("b"),
+    prop("c"),
+    append(" is great!")
+);
+```
+
+L' ultima versione è la più compatta e chiara nella lettura, in questi esempi il codice nelle funzioni è molto semplice, immaginate se avete qualcosa di più articolato se qualcuno può obbiettare che non cambia.
+
+### Codice più leggibile
+
+Abbiamo visto :
+
+- L' importanza delle costanti rispetto alle variabili definite con let, dove mi permette di creare meno bug, mi obbliga a usare meglio la semantica e il refactoring del codice è meno rischioso e molto più veloce.
+
+- Con la maybe abbiamo visto come mi permette di non utilizzare più la if con i suoi brutti costrutti, variabili intermedie ecc.
+
+- Con le funzioni che restituiscono funzioni come possiamo passare le funzioni ai map senza parametro iniziale, con la giusta semantica leggo cosa fa, non come lo deve fare.
+
+- Con la chain non devo ripetere più .map, ma passo direttamente la sequenza di funzioni da eseguire.
+
+Nella programmazione funzionale ci si concentra su cosa si deve fare non come lo si deve fare come sequenza di azioni, questo ci permette di concentrarci sul flusso da seguire, con la chain questo è molto chiaro, quindi la maybe con la chain significa dire :
+
+fino a quando non trovi errori , prendi la prob b, la prop c e inserisci una stringa finale.
+
+quando leggo il codice mi concentro nelle ultime righe del codice, dove dovrebbe essere chiaro il flusso e non i dettagli fosse anche .map o il parametro della funzione l unico sforzo richiesto è la giusta semantica, ma non devo scorrerlo come nel codice imperativo su e giù , di nuovo su e giù per seguire il flusso che mi perdo facile.
+
+I dettagli vado a leggermeli per cambiare qualcosa, ma una volta che funzionano non mi interessano, e la manutenzione del codice cambia molto in questo modo, se può sembrare un maniacale risparmiare quel poco le cosa cambiano quando vado a modificare.
+
+la if è un costrutto pesante per seguire il flusso, per questo viene usata la maybe, chiamata anche option dove molti linguaggi per esempio rust la usano di base, in generale vi consiglio di utilizzarla il meno possibile..
+
+## link utili
+
+[dove provare il codice on line](https://jsfiddle.net/)
+
+[articolo di riferimento ](https://www.codingame.com/playgrounds/6272/building-a-maybe-in-javascript)
+
+[i functor ](https://javascript.plainenglish.io/the-definite-guide-to-functors-in-js-6f5e82bd1dac)
+
+[i functor](https://stackoverflow.com/questions/63390339/functor-implementation-in-javascript)
