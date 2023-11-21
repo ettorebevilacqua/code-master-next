@@ -12,26 +12,24 @@ Uno dei grossi problemi alla programmazione funzionale è l' abitudine alla prog
 ## I contenitori
 
 La pentola, il piatto, il vassoio, il cesto della lavatrice cosa hanno in comune ?
-sono contenitori, il loro scopo è contenere qualcosa, non importa cosa, se metto i vestiti nella pentola,
-e il cibo nella lavatrice, dal loro punto di vista funzionale, non cambiano le cose, svolgeranno sempre la loro funzione di contenere qualcosa.
+sono contenitori, il loro scopo è contenere qualcosa, non importa cosa, se metto i vestiti nella pentola, e il cibo nella lavatrice, dal loro punto di vista funzionale, non cambiano le cose, svolgeranno sempre la loro funzione di contenere qualcosa.
 
 Per usare cosa contengono, devo aprire la lavatrice, sollevare il coperchio, mangiare cosa è contenuto nel piatto, senza queste azioni non servono a nulla.
 
-nella programmazione funzionale, abbiamo i contenitori, in genere ostici da comprendere, ma rimanendo nella analogia, essi servono per contenere un valore,
-dove mi serve poterlo inserire, fare qualcosa dentro il contenitore e aprirlo per restituirlo.
+Nella programmazione funzionale, abbiamo i contenitori, in genere ostici da comprendere, ma rimanendo nella analogia, essi servono per contenere un valore, dove mi serve poterlo inserire, fare qualcosa dentro il contenitore e aprirlo per restituirlo.
 
 ### Le Promise
 
 Un esempio di questo concetto che dovrebbe essere famigliare in javascript è la promise, che fa da contenitore di valori :
 
-```js
+```javascript
 const myPromise = new Promise((resolve, reject) => {
-const startTime = Date.now()
-console.log('start promise ')
-setTimeout(() => {
-console.log('resolve promise in ms ', Date.now() - startTime)
-resolve(64)
-}, 300)
+    const startTime = Date.now()
+    console.log('start promise ')
+    setTimeout(() => {
+        console.log('resolve promise in ms ', Date.now() - startTime)
+        resolve(64)
+    }, 300)
 });
 
 const newPromiseOfHalf = myPromise.then(num => num / 2 )
@@ -41,7 +39,7 @@ console.log('promise =', myPromise.toString() )
 newPromiseOfHalf.then(ris => console.log('risultato = ', ris))
 ```
 
-Dentro a new Promise, abbiamo messo un valore che viene popolato con un certo ritardo, questo in quanto la promise è fatta per gestire valori futuri.
+Dentro a new Promise, abbiamo messo un valore che viene popolato con un certo ritardo in quanto la promise è fatta per gestire valori futuri.
 Ma se provo a stamparla, mi restituisce la sua definizione che fa da contenitore, come se vedessi la pentola e non cosa contiene.
 
 Quello che ci interessa è che dobbiamo passare una funzione per visualizzare il valore :
@@ -53,14 +51,13 @@ come dire, non mangio la pentola o il piatto perchè contiene cibo, come non mi 
 ### La difficoltà iniziale della promise
 
 Le promise sono al inizio un po ostiche da comprendere, ma poi le utilizziamo senza problemi, anche se non conosciamo i dettagli implementativi.
-
-Allo stesso modo nella programmazione funzionale in concetto di monadi, provocano la stessa difficoltà nel comprenderle, quale è il problema ??
+Allo stesso modo nella programmazione funzionale il concetto di monadi, provocano la stessa difficoltà nel comprenderle, quale è il problema ??
 
 ***L' abitudine mentale***, ragionare come si è imparato a programmare, in modo imperativo cioè una sequenza lineare di istruzioni, allo stesso modo gli array con le funzioni map e reduce si comportano anche loro come contenitori come le promise.
 
 Partiamo con un esempio :
 
-```js
+```javascript
 const myPromise = Promise.resolve(64) // promise contiene il valore 64
 
 divide = num =(num => num / 2)
@@ -73,7 +70,7 @@ myPromise
 
 vediamo in un altro modo la cosa :
 
-```js
+```javascript
 const newPromise = myPromise.then(divide) // restituisce una promise
 newPromise.then(divide) // restituisce una promise dove il then successivo gli appartiene
 .then(divide) 8
@@ -86,13 +83,11 @@ Cosa è importate da notare in questo esempio ?
 
 - che le promise , restituiscono sempre promise , per questo posso concatenarle come successioni di operazioni.
 - non uso direttamente il valore contenuto, ma una funzione che la utilizza.
-- se proprio volessi usare il valore interno che è il parametro della funzione passata alla then, l esempio è il console.log
 
 Questi sono i concetti più importanti di contenitore.
-
 Proviamo a creare un contenitore che come la promise, restituisce sempre un contenitore che contiene un valore :
 
-```js
+```javascript
 const Container = x => ({
 map: f => Container(f(x)), // qui definisco map che restitisce un container
 toString: () => `${x}`,
@@ -110,23 +105,23 @@ return Container(text)
 
 Come vediamo, abbiamo creato una struttura con map e toString con una funzione. Il suo parametro iniziale fa da costruttore per contenere tale valore.
 
-Nelle promise, possiamo concatenare una serie di them qui chiamate map, ugualmente alle then ***prendono una funzione e la applicano al valore INTERNO*** del container, in questo caso text. vediamo come ho definito map :
+Nelle promise, possiamo concatenare una serie di then qui chiamate map, ugualmente alle then ***prendono una funzione e la applicano al valore INTERNO*** del container, in questo caso text. vediamo come ho definito map :
 
 ***map: f => Container(f(x))***
 
 Map prende una funzione f, e restituisce di nuovo un container con f(x) il quale applica la funzione con il valore del contenitore, chiamato map.
 
-Il gioco importante sta ***nel restituire un nuovo contenitore*** di uguale struttura ma con il valore trasformato dalla funzione map passata, il nuovo contenitore, a sua volta ha la funzione Map, allo stesso modo di come facevamo con le Promise con il suo then, che sarebbe il map con un altro nome più sensato al concetto di valore futuro delle promise, il concetto delle due è uguale, ripetiamo :
+Il gioco importante sta ***nel restituire un nuovo contenitore*** di uguale struttura ma con il valore trasformato dalla funzione map passata, il nuovo contenitore, a sua volta ha la funzione map, allo stesso modo di come facevamo con le Promise con il suo then, che è il map con un altro nome più sensato al concetto di valore futuro delle promise, il concetto delle due è uguale, ripetiamo :
 
 ***applicare la funzione e restituire il contenitore.***
 
-Ma questo codice si potrebbe dire, è poco utile, è solo più prolisso per fare una serie di trasformazioni su una stringa, nelle promise si giustifica il fatto che inizialmente non esiste il valore del contenitore come vengono qui invece inizializzati i Container.
+Ma questo codice è poco utile, è solo più prolisso per fare una serie di trasformazioni su una stringa, nelle promise si giustifica il fatto che inizialmente non esiste il valore del contenitore come vengono qui invece inizializzati i Container.
 
 ### La monade maybe
 
 vediamo ora un altro tipo di container questa volta più utile: la maybe :
 
-```js
+```javascript
 const isNullOrUndef = (value) => value === null || typeof value === "undefined";
 
 const maybe = (value) => ({
@@ -148,32 +143,32 @@ console.log("Maybe.nothing is nothing?", maybeNumberTwo.isNothing());
 
 le cose ora sono un po cambiate rispetto al Container con map, la prima maybe restiuscie isNothing e extract
 
-```js
+```javascript
 const maybe = (value) => ({
 isNothing: () => isNullOrUndef(value),
 extract: () => value
 });
 ```
 
-Banalmente questo codice serve per restituire un booleano che dice se il valore value è nullo o meno. non abbiamo più il map, ma solo questa valutazione,senza di esso non posso accedere al valore interno, e quindi utilizziamo extract per poterlo utilizzare.
+Banalmente questo codice serve per restituire un booleano che dice se il valore value è nullo o meno. non abbiamo più il map (per ora), ma solo questa valutazione, senza di esso non posso accedere al valore interno, e quindi utilizziamo extract per poterlo utilizzare.
 
-Successivamente la vediamo come se fosse nuovamente definita come Maybe con m grande :
+Successivamente la vediamo come se fosse nuovamente definita con nome Maybe ma con m grande :
 
-```js
+```javascript
 const Maybe = {
 just: maybe,
 nothing: () => maybe(null)
 };
 ```
 
-Da notare che just e nothing , ***restituiscono sempre lo stesso tipo di contenitore*** in questo caso maybe, nelle promise restituiscono sempre il tipo promise ed è questo che permette la concatenazione.
+Da notare che just e nothing , ***restituiscono sempre lo stesso tipo di contenitore*** in questo caso maybe, nelle promise restituiscono sempre il tipo promise il quale permette la concatenazione.
 
 - Just restituisce una nuova istanza della maybe pronta per contenere un valore nel suo costruttore.
 - Nothing invece restituisce una funzione senza parametri, al interno istanza una maybe con un valore null perché vogliamo rappresentare la mancanza di valori come suggerisce il suo nome.
 
 qui un esempio del loro utilizzo :
 
-```js
+```javascript
 const maybeNumberOne = Maybe.just("a value");
 const maybeNumberTwo = Maybe.nothing();
 ```
@@ -184,26 +179,23 @@ possiamo poi interrogare se la maybe è nulla :
 *console.log("Maybe.just is nothing?", maybeNumberOne.isNothing());*
 
 Per ora quindi la maybe si limita a dirci se il valore inserito è nullo o meno, dal inglese May be = potrebbe essere.
-
 Questo codice però non è di grande utilità, proviamo a ridefinirlo come container aggiungendo una funzione di map, che lo rende utile.
 
-### la funzione di map nei container
+### La funzione di map nei container
 
-Le promise dicevamo che sono container, quindi hanno il map, che però cambia il nome con then perché restituiscono valori futuri come dire : quando avrai il valore allora fa questo, il senso di map o then è lo stesso : "fai qualcosa", le funzioni "fanno qualcosa", allo stesso modo gli array hanno la funzione di map per trasformare tutti i suoi valori.
+Le promise dicevamo sono container, con il then che fa da map perché restituiscono valori futuri, come dire : quando avrai il valore allora fa questo, il senso di map o then è lo stesso : "fai qualcosa", le funzioni "fanno qualcosa", allo stesso modo gli array hanno la funzione di map per trasformare tutti i suoi valori, e appaiono strani con la funzione da passare dentro, ma non basta il for ?
 
-In altre parole facciamo qualcosa con questi valori con il map, ma precisiamo con il nome map non limitandoci a chiamarla funzione in modo più generico.
+In altre parole facciamo qualcosa con questi valori con il map, ma come mai questo nome ?
 
 #### Definizione di map e le costanti
 
-Diciamo che map ***trasforma i valori***, il nome viene dalla teoria degli insiemi : mappa un valore a un altro associato tramite una  funzione matematica, motivo del suo nome map.
+Diciamo che map ***trasforma i valori***, il nome viene dalla teoria degli insiemi : mappa un valore a un altro associato tramite una  funzione matematica, motivo del suo nome map, ma qui ora stiamo evitando le teorie per non complicarci a vita e  ***consiglio di limitarsi a dire che map trasforma un valore passando una funzione che chiamiamo di trasformazione***,  il suo senso aderisce al concetto di funzione nella matematica che che mappa i valori da un insieme a un altro.
 
-Citiamo questa definizione senza addentrarci, in quanto per evitare confusione non ci interessa il dettaglio più teorico. ***consiglio di limitarsi a dire che map trasforma un valore e la chiamiamo funzione di trasformazione***, map per noi è sempre una funzione, ma il suo senso aderisce al concetto di funzione nella matematica.
-
-#### usare le costanti
+#### Usare le costanti
 
 Caratteristica della programmazione funzionale è la ***trasformazione di valori costanti*** in altri valori costanti piuttosto che modificare la stessa variabile come siamo abituati a ragionare nella programmazione imperativa.
 
-```js
+```javascript
 // uso di variabili
 
 let nome = 'Giulio'
@@ -215,23 +207,26 @@ const nome = 'Giulio'
 const nomeCognome = nome + ' Rossi'
 ```
 
-In questo esempio quello che cambia è che devo introdurre una nuova "variabile" costante. Il valore precedente viene mantenuto, ma il nuovo valore necessità di un nome che meglio descrive il **nuovo** valore, questo porta a una maggiore semantica e meno bug per errori di assegnazione, meno bisogno di commentare il codice dove se ben scritto si spiega da solo, in particolare il refactoring del codice è più agevole.
+In questo esempio quello che cambia è che devo introdurre una nuova "variabile" costante. Il valore precedente viene mantenuto, ma il nuovo valore necessità di un nome che meglio descrive il **nuovo** valore.
 
-In questo esempio se dobbiamo poi riprendere solo il nome, dovrei cambiare la variabile let come ho fatto con le costanti con le variabili nome e nomeCognome, e poi modificare dove viene utilizzata la viariabile nome, se dimentichiamo qualcosa può portare a bug.
+questo porta a una maggiore semantica e meno bug per errori di assegnazione, ho poi meno bisogno di commentare il codice, se ben scritto si spiega da solo, in particolare il refactoring del codice è più agevole.
+
+Se dobbiamo poi riprendere solo il nome, dovrei cambiare la variabile let come ho fatto con le costanti con le variabili nome e nomeCognome, e poi modificare dove viene utilizzata la viariabile nome, se dimentichiamo qualcosa può portare a bug.
 
 Diciamo che ***l uso di let in javascript dovrebbe essere limitato il più possibile***, in quanto sono fonte di bug.
-
-Ora dovrebbe essere più chiaro perché utilizziamo il termine trasformare piuttosto che riassegnare.
+Ora dovrebbe essere più chiaro perché utilizziamo il termine ***trasformare*** piuttosto che riassegnare.
 
 ### La nostra maybe con la funzione map
 
-```js
+```javascript
 const isNullOrUndef = (value) => value === null || typeof value === "undefined";
 
 const maybe = (value) => ({
 isNothing: () => isNullOrUndef(value),
 extract: () => value,
-map: (transformer) => isNullOrUndef(value) ? Maybe.nothing() : Maybe.just(transformer(value))
+map: (transformer) => isNullOrUndef(value)
+    ? Maybe.nothing()
+    : Maybe.just(transformer(value))
 });
 
 const Maybe = {
@@ -251,7 +246,11 @@ console.log(maybeA.extract()); // fp is great S
 
 vediamo subito il map introdotto :
 
-***map: (transformer) => isNullOrUndef(value) ? Maybe.nothing() : Maybe.just(transformer(value))***
+```javascript
+map: (transformer) => isNullOrUndef(value)
+  ? Maybe.nothing()
+  : Maybe.just(transformer(value))
+```
 
 se il valore è :
 
@@ -264,7 +263,7 @@ La cosa importante da sottolineare è che :
 
 Un esempio con valori nulli :
 
-```js
+```javascript
 const a = { b: { c: "fp"} };
 
 const maybeA = Maybe.just(a)
@@ -287,13 +286,13 @@ console.log(maybeB.extract()); // null
 nel successivo map  ***.map(b => b.c)*** che è  Maybe.nothing(), non viene applicata la funzione passata b => b.c come mai ??
 riprendendo la definizione di map della maybe :
 
-***map: (transformer) => isNullOrUndef(value) ? Maybe.nothing() : Maybe.just(transformer(value))***
+`map: (transformer) => isNullOrUndef(value) ? Maybe.nothing() : Maybe.just(transformer(value))`
 
-il secondo map, che è in realtà la seconda "nuova" maybe restituita dal map della maybe precedente come Maybe.nothing(), al suo interno come contenitore ha il valore null, e quindi ***isNullOrUndef(value) ? Maybe.nothing()*** restituisce di nuovo Maybe.nothing(), e cosi a catena il successivo .map, che inevitabilmente sono tutte maybe con valore nullo, quindi tutte Maybe.nothing().
+il secondo map, che è in realtà la seconda "nuova" maybe restituita dal map della maybe precedente come Maybe.nothing(), al suo interno come contenitore ha il valore null, e quindi ***isNullOrUndef(value) ? Maybe.nothing()*** restituisce di nuovo Maybe.nothing(), e cosi a catena il successivo .map, che inevitabilmente sono tutte maybe con valore nullo, quindi tutte Maybe.nothing(), `Maybe.just(transformer(value))` non viene più eseguita.
 
 rivediamo con il commento di come vengono restituite ***nuove maybe*** dal map riga per riga :
 
-```js
+```javascript
 const a = { b: { c: "fp"} };
 
 const maybeB = Maybe.just(a)
@@ -304,7 +303,7 @@ const maybeB = Maybe.just(a)
 console.log(maybeB.extract()); // null
 ```
 
-La cosa importante, è che la catena si ferma, in quanto nella biforcazione del map non viene eseguito il ramo ***Maybe.just(transformer(value))***  che applica la funzione transformer passata, e tutte le successive maybe create con .map saranno sempre nulle come Maybe.nothing()-
+La cosa importante, è che la catena si ferma, in quanto nella biforcazione del map non viene eseguito il ramo ***Maybe.just(transformer(value))***  che applica la funzione transformer passata, e tutte le successive maybe create con .map saranno sempre nulle come Maybe.nothing()
 
 più precisamente, ***tutte le funzioni nei map successivi non vengono eseguite in presenza di valori null***, in questo modo non possiamo più generare errori per valori nulli, che tipicamente porta a bug nel programma !
 
@@ -318,30 +317,30 @@ La maybe permette una biforcazione del flusso, come fa la if, ma senza che devo 
 
 diversamente avrei dovuto scrivere :
 
-```js
-const val1 = a.d
+```javascript
+const val1 = a
 
 let val2=null
 if (val1) {
-val2 = val1
+val2 = val1.d
 }
 
 let val3=null
 if (val2) {
-val3 = val2
+val3 = val2.c
 }
 
 console.log(val3); // null
 
 ```
 
-come cambia la leggibilità ? notare come devo ricorrere a variabili intermedie non più necessarie con la maybe che segue linearmente il flusso.
+come cambia la leggibilità ? notare come devo ricorrere a variabili intermedie (o terribili nidificazioni di if),  non più necessarie con la maybe che segue linearmente il flusso.
 
 ## il chaining di funzioni
 
 Aggiungiamo queste 2 funzioni di utilità al codice precedente :
 
-```js
+```javascript
 const prop = (propName) => (obj) => obj[propName];
 const append = (appendee) => (appendix) => appendee + appendix;
 
@@ -352,12 +351,12 @@ const val = prop('b')(a) // { c: "fp"}
 // posso scrivere anche come :
 
 const getPropB = prop('b')
-const val = getPropB(a) //  { c: "fp"}
+const valB = getPropB(a) //  { c: "fp"}
 
 // se voglio accedere a c :
 const getPropC = prop('c')
 
-const val = getPropC(getPropB(a)) //   "fp"
+const valC = getPropC(getPropB(a)) //   "fp"
 
 ```
 
@@ -365,13 +364,10 @@ Ho creato delle funzioni con un solo parametro che restituiscono funzioni per il
 
 ***const val = getPropC(getPropB(a))***
 
-getPropC riceve \{ c: "fp"} restituito da getPropB(a) , quindi legge il valore in c ce è "fp"
-
+getPropC riceve \{ c: "fp"} restituito da getPropB(a) , quindi legge il valore in `c` con valore "fp"
 usando queste funzioni il codice precedente diventa :
 
-```js
-xx
-
+```javascript
 const prop = (propName) => (obj) => obj[propName];
 const append = (appendee) => (appendix) => appendee + appendix;
 
@@ -383,19 +379,23 @@ const maybeA = Maybe.just(a)
 console.log(maybeB.extract()); // fp is great!
 ```
 
-ora dentro  al primo map gli passo.map(prop("b")) pronta a leggere il membro b di un oggetto passato : prop("b") al interno quindi diventa:
+Dentro al primo map gli passo `.map(prop("b"))` pronta a leggere il membro b di un oggetto passato : `prop("b")` al interno quindi diventa:
 
-obj => obj["b"] che è la stessa cosa del nostro precedete a => a.b
+- `obj => obj["b"]` che è la stessa cosa del nostro precedete `a => a.b`
+- append ugualmente è pronto a riceve una stringa, per poi concatenarla nella sua funzione restituita.
 
-append ugualmente è pronto a riceve una stringa, per poi concatenarla nella sua funzione restituita.
+### First-Class Function
 
-in prima battuta diciamo che aumenta la leggibilità in quanto non specifico più nella funzione dentro al map il parametro (non importa il suo nome) del oggetto da leggere, tutte le funzione passate al map hanno tale parametro ora omesso perché gestito dalla funzione di ritorno.
+In prima battuta diciamo che aumenta la leggibilità in quanto non specifico più nella funzione dentro al map il parametro (non importa il suo nome) del oggetto da leggere, tutte le funzione passate al map hanno tale parametro in quanto funzioni, concetualemente gli passiamo il nome della funzione che  questo aspetto si chiama  First-Class Function cioè **le funzioni si comportano come una variabile**.
 
-abbiamo fatto un refactory con lo stile point-free, cioè non specifichiamo come detto il parametro iniziale, la leggibilità aumenta , più codice inseriamo più dobbiamo leggere cosa fa per capire, con un nome appropriato indico meglio con un sola parola.
+### Point-free
 
-ma a cosa ci torna utile queste osservazioni di funzioni cosi definite rispetto alla nostra maybe ?? che potrei evitare la catena .map, passando più chiaramente il flusso da gestire :
+Abbiamo fatto un refactory con lo stile **point-free**, cioè non specifichiamo come detto il parametro iniziale, la leggibilità aumenta, più codice inseriamo più dobbiamo leggere cosa fa per capire, con un nome appropriato indico meglio con un solo termine.
 
-```js
+A cosa torna utile a noi queste osservazioni di funzioni cosi definite rispetto alla nostra maybe ??
+Che potrei evitare la catena .map, passando più chiaramente il flusso da gestire :
+
+```javascript
 const isNullOrUndef = (value) => value === null || typeof value === "undefined";
 
 const maybe = (value) => ({
@@ -415,13 +415,12 @@ La funzione chain nella nostra Maybe
 
 - prende una lista di funzioni con il parametro (...fns)
 - restituisce una funzione  con il paramentro (input)
-- ciclo le funzioni passate con reduce eseguendo la catena di maybe con output passando la funzione corrente passata
+- nella funzione restituita, ciclo le funzioni passate con reduce eseguendo la catena di maybe con `output` passando la funzione corrente `curr`
 
-una volta passate le funzioni alla chain, ho una funzione con il parametro input che prende una maybe, la reduce inizializzata a questa maybe, essegue il map della maybe output passando la funzione corrente curr.
+Diciamo anche che passo alla chain una serie di funzioni che vengono inserite nel map di una maybe `output`, questa creata dal map precedente che la restituisce come variabile `output`, la maybe iniziale è `input` che poi chiamiamo `output`.
+Il codice dovrebbe chiarire le idee rispetto a questa descrizione;
 
-il codice dovrebbe chiarire le idee rispetto a questa descrizione;
-
-```js
+```javascript
 const prop = (propName) => (obj) => obj[propName];
 const append = (appendee) => (appendix) => appendix + appendee;
 
@@ -437,13 +436,12 @@ const goodInput = Maybe.just(a);
 const badInput = Maybe.just({});
 
 console.log(appendToC(goodInput).extract())
-console.log(appendToC(badInput).extract());
-
+console.log(appendToC(badInput).extract())
 ```
 
-con chain abbiamo eliminato concatenazione dei map, passando più chiaramente una lista di funzioni, senza l uso di prop e append mi sarei trovato
+con chain abbiamo eliminato la concatenazione dei map, passando più chiaramente una lista di funzioni, senza usare prop e append mi sarei trovato
 
-```js
+```javascript
 const appendToC = Maybe.chain(
     o => o.b
     o => o.c,
@@ -457,7 +455,7 @@ const maybeA = Maybe.just(a)
 .map(b => b.c)
 .map(c => c + " is great!");
 
-//  versione finale
+//  versione finale meno verbosa
 
 const appendToC = Maybe.chain(
     prop("b"),
@@ -466,7 +464,13 @@ const appendToC = Maybe.chain(
 );
 ```
 
-L' ultima versione è la più compatta e chiara nella lettura, in questi esempi il codice nelle funzioni è molto semplice, immaginate se avete qualcosa di più articolato se qualcuno può obbiettare che non cambia.
+L' ultima versione è la più compatta e chiara nella lettura, in questi esempi il codice nelle funzioni è molto semplice, immaginate se avete qualcosa di più articolato se qualcuno può obbiettare che non cambiano molto le cose.
+
+### Le promise e la nostra maybe non sono monadi
+
+In questi esempi ho chiamato la monade maybe, ma in realtà rimane un container in quanto ha la funzione map, per essere monade abbiamo bisogno di altri membri oltre al map, ma qui ci siamo concentrati al suo concetto di base, pronta per essere utilizzata.
+
+Ho inserito link utili per approfondire il discorso oltre, o se si vuole studiare meglio la programmazione funzionale, questa introduzione dovrebbe aiutare.
 
 ### Codice più leggibile
 
@@ -478,23 +482,25 @@ Abbiamo visto :
 
 - Con le funzioni che restituiscono funzioni come possiamo passare le funzioni ai map senza parametro iniziale, con la giusta semantica leggo cosa fa, non come lo deve fare.
 
-- Con la chain non devo ripetere più .map, ma passo direttamente la sequenza di funzioni da eseguire.
+- Con la chain non devo ripetere più .map, passo direttamente la sequenza di funzioni da eseguire diventado diretta la semantica del flusso.
 
-Nella programmazione funzionale ci si concentra su cosa si deve fare non come lo si deve fare come sequenza di azioni, questo ci permette di concentrarci sul flusso da seguire, con la chain questo è molto chiaro, quindi la maybe con la chain significa dire :
+Nella programmazione funzionale ci si concentra **su cosa si deve fare non come lo si deve fare** come sequenza di azioni, questo ci permette di concentrarci sul flusso da seguire, con la chain questo è molto chiaro, quindi la maybe con la chain significa dire :
 
-fino a quando non trovi errori , prendi la prob b, la prop c e inserisci una stringa finale.
+***Fino a quando non trovi errori , prendi la prob b, la prop c e inserisci una stringa finale.***
 
-quando leggo il codice mi concentro nelle ultime righe del codice, dove dovrebbe essere chiaro il flusso e non i dettagli fosse anche .map o il parametro della funzione l unico sforzo richiesto è la giusta semantica, ma non devo scorrerlo come nel codice imperativo su e giù , di nuovo su e giù per seguire il flusso che mi perdo facile.
+Quando leggo il codice mi concentro nelle ultime righe del codice, deve essere chiaro il flusso e non i dettagli fosse anche il solo e corto .map o il parametro della funzione, l unico sforzo richiesto è la giusta semantica, ma non devo scorrerlo come nel codice imperativo su e giù , di nuovo su e giù per seguire il flusso che mi perdo facilmente.
 
 I dettagli vado a leggermeli per cambiare qualcosa, ma una volta che funzionano non mi interessano, e la manutenzione del codice cambia molto in questo modo, se può sembrare un maniacale risparmiare quel poco le cosa cambiano quando vado a modificare.
 
-la if è un costrutto pesante per seguire il flusso, per questo viene usata la maybe, chiamata anche option dove molti linguaggi per esempio rust la usano di base, in generale vi consiglio di utilizzarla il meno possibile..
+la if è un costrutto pesante per seguire il flusso, per questo viene usata la maybe, chiamata anche option dove molti linguaggi per esempio rust la usano di base, in generale vi consiglio di utilizzarla il meno possibile, e anche senza grossi studi rafforzare l approccio intendendo almeno le parti facili alla programmazione funzione dove javascript si presta molto bene, considerando che molti linguaggi non funzionali hanno inziato ad addottarla.
 
 ## link utili
 
 [dove provare il codice on line](https://jsfiddle.net/)
 
 [articolo di riferimento ](https://www.codingame.com/playgrounds/6272/building-a-maybe-in-javascript)
+[](https://blog.logrocket.com/javascript-either-monad-error-handling/)
+[](https://medium.com/javascript-scene/javascript-monads-made-simple-7856be57bfe8)
 
 [la guida più amata per l' introduzione alla programmazione funzionale](https://mostly-adequate.gitbook.io/mostly-adequate-guide/)
 
