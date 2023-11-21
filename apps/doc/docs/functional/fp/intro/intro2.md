@@ -498,9 +498,11 @@ la if è un costrutto pesante per seguire il flusso, per questo viene usata la m
 
 [dove provare il codice on line](https://jsfiddle.net/)
 
-[articolo di riferimento ](https://www.codingame.com/playgrounds/6272/building-a-maybe-in-javascript)
-[](https://blog.logrocket.com/javascript-either-monad-error-handling/)
-[](https://medium.com/javascript-scene/javascript-monads-made-simple-7856be57bfe8)
+[articolo di riferimento](https://www.codingame.com/playgrounds/6272/building-a-maybe-in-javascript)
+[un altro articolo sulle monadi](https://medium.com/javascript-scene/javascript-monads-made-simple-7856be57bfe8)
+[either](https://blog.logrocket.com/javascript-either-monad-error-handling/)
+
+[implentazioni](https://thecodest.co/blog/power-of-functional-programming-in-javascript-part-3-functor-monad-maybe/)
 
 [la guida più amata per l' introduzione alla programmazione funzionale](https://mostly-adequate.gitbook.io/mostly-adequate-guide/)
 
