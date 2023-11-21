@@ -288,7 +288,7 @@ riprendendo la definizione di map della maybe :
 
 `map: (transformer) => isNullOrUndef(value) ? Maybe.nothing() : Maybe.just(transformer(value))`
 
-il secondo map, che è in realtà la seconda "nuova" maybe restituita dal map della maybe precedente come Maybe.nothing(), al suo interno come contenitore ha il valore null, e quindi ***isNullOrUndef(value) ? Maybe.nothing()*** restituisce di nuovo Maybe.nothing(), e cosi a catena il successivo .map, che inevitabilmente sono tutte maybe con valore nullo, quindi tutte Maybe.nothing(), `Maybe.just(transformer(value))` non viene più eseguita.
+il secondo map, che è in realtà la seconda "nuova" maybe restituita dal map della maybe precedente come Maybe.nothing(), al suo interno come contenitore ha il valore null, e quindi ***isNullOrUndef(value) ? Maybe.nothing()*** restituisce di nuovo Maybe.nothing(), e cosi a catena il successivo .map, che inevitabilmente sono tutte maybe con valore nullo, quindi tutte Maybe.nothing(), `Maybe.just(transformer(value))` e la funzione transformer non viene più eseguita.
 
 rivediamo con il commento di come vengono restituite ***nuove maybe*** dal map riga per riga :
 
